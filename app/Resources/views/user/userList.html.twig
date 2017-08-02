@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <h1>{{ title }} {# 这是注释， 不会被解析 #}</h1>
+
+        <ul id="navigation">
+            {% for item in userList%}
+            <li>{{ item.getId()}} -- {{ item.getName() }} -- {{ item.getPwd() }}</li>
+            {% endfor%}
+        </ul>
+    </body>
+</html>
