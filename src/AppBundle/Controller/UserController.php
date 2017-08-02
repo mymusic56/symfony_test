@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use AppBundle\Entity\User;
 use AppBundle\Serverice\UserService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\NativeRequestHandler;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class UserController extends Controller{
     /**
@@ -135,6 +138,9 @@ class UserController extends Controller{
      * @Route("/user/getRandom")
      */
     public function getRandom(UserService $userService){
+        /*
+         * Service 使用方式一：
+         */
         $res = $userService::aaa();
         $b = $userService->b();
         return new Response("random: $res, $b");
@@ -145,7 +151,9 @@ class UserController extends Controller{
      */
     public function getRandom2(){
         /*
+         * Service 使用方式二：
          * 没有语法提示
+         * 
          */
         $userService = $this->get(UserService::class);
         $res = $userService::aaa();
@@ -153,5 +161,69 @@ class UserController extends Controller{
         return new Response("getRandom2: $res, $b");
     }
     
+    /**
+     * @Route("/user/testRequest")
+     */
+    public function testRequestAction(Request $request){
+        
+        /*
+         * get session
+         */
+        $session = $request->getSession();
+        $exist = 1;
+        $session_name = $session->get('username');
+        if(!$session_name){
+            $exist = 0;
+            $session->set('username', 'zhangsan');
+        }
+        $return = 'session: '.$exist.',username: '.$session_name.'</br>,';
+        
+        
+        /*
+         * get and set cookie
+         */
+        $cookie_name = $request->cookies->get('cookie_username');
+        
+        $allCookie = $request->cookies->all();
+        $allHeader = $request->headers->all();
+        
+        $exist = 1;
+        $response = new Response();
+        #删除cookie
+//         $response->headers->clearCookie('cookie_username');
+//         $response->send();
+        if(!$cookie_name){
+            $exist = 0;
+            //设置有效时间导致cookie保存失败？？？？
+            $response->headers->setCookie(new Cookie('cookie_username', 'zhangsan'));
+            $response->send();
+//             var_dump($res->headers->getCookies());
+        }
+        $return .= 'cookie: '.$exist.',username: '.$cookie_name.'</br>,';
+        
+        
+        
+        
+        $return .= ' request-method:'.$request->getMethod().'</br>,';
+        $return .= ' request-host:'.$request->getHost().'</br>,';
+        $return .= ' request-uri:'.$request->getUri().'</br>,';
+        $return .= ' request-secure:'.$request->isSecure().'</br>,';
+        
+        /*
+         * 获取 request body
+         */
+        $data = $request->request->all();
+        $username = $request->request->get('username');
+        
+        $return .= json_encode($data);
+        $return .= $username;
+//         return new Response($return);
+        
+        return $this->render('user/testRequest.html.twig',array(
+                'cookie' => $cookie_name,
+                'session' => $session_name,
+                'string' => $return
+        ));
+    }
     
 }
