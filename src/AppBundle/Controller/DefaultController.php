@@ -30,7 +30,7 @@ class DefaultController extends Controller
          * 
          */
         //访问地址： http://localhost:8000/hello/zhangsan
-        return $this->render('default/hello.html.twig',array(
+        return $this->render('default/hello.html',array(
             'name' => $name    
         ));
     }

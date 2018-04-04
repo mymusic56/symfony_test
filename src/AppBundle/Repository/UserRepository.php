@@ -15,14 +15,14 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * 根据GroupID查询用户
      * 
-     * @param string $name
+     * @param int $groupId
      */
-    public function getUserListByName(string $name)
+    public function getUserListByGroupId(int $groupId)
     {
         $query = $this->createQueryBuilder('u')
-            ->where("u.nameAlias =:name")
+            ->where("u.groupId =:groupId")
             ->orderBy('u.id', 'DESC')
-            ->setParameter('name', $name)
+            ->setParameter('groupId', $groupId)
             ->getQuery();
         $result = $query->getResult();
         return $result ? $result : new User();

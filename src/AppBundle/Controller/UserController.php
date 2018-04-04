@@ -93,7 +93,7 @@ class UserController extends Controller{
     
     /**
      * @ApiDoc(
-     *      description="老是报字段不存在错误。。。。"
+     *      description="老是报字段不存在错误。。。。，原因是定义字段的书写错误"
      * )
      * @Route("/user/error")
      */
@@ -101,14 +101,14 @@ class UserController extends Controller{
     {
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
-            'SELECT u.device,u.name
+            'SELECT u.deviceMark,u.name
                     FROM AppBundle:User u
                     WHERE u.id > :id
                     ORDER BY u.id ASC'
-            )->setParameter('id', 3);
+            )->setParameter('id', 1);
             
         $list = $query->getResult();
-        var_dump($list);die;
+        var_dump($list);
         
         $data = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'deviceMark' => 'Leeee'
@@ -124,21 +124,23 @@ class UserController extends Controller{
     {
         
         $em = $this->getDoctrine()->getManager();
-        
         /*
          * 前提条件：\AppBundle\Entity\User注解中加入 @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
          */
         /* @var $userRepository \AppBundle\Repository\UserRepository */
+//         $userRepository = $em->getRepository(User::class);
         $userRepository = $em->getRepository('AppBundle:User');
         
-        $result = $userRepository->getUserListByName('zhangsan');
+        $result = $userRepository->getUserListByGroupId(1);
         
         $res = [];
+        /* @var $result \AppBundle\Entity\User */
         foreach ($result as $item) {
             $res[] = [
                 'id' => $item->getId(),
-                'name' => $item->getNameAlias(),
-                'created' => $item->getCreated(),
+                'name' => $item->getName(),
+                'created' => $item->getCreated()->format('Y-m-d H:i:s'),
+                'created2' => $item->getCreated()->getTimestamp(),
                 'group_id' => $item->getGroupId(),
             ];
         }

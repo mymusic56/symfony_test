@@ -1,116 +1,101 @@
 <?php
+
 namespace AppBundle\Entity;
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
+ * User
  *
+ * @ORM\Table(name="user")
+ * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  */
-class User{
+class User
+{
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-    
-//     /**
-//      * @ORM\Column(type="integer")
-//      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\User")
-//      * @ORM\JoinColumn(name="group_id",referencedColumnName="id")
-//      */
-//     private $group;
-    
-    /**
-     * $ORM\Column(name="group_id", type="integer")
-     */
-    private $groupId;
-    
-    
-    /**
-     * @ORM\Column(name="device_mark",type="string")
+     * @var string|null
+     *
+     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      */
     private $name;
-    
+
     /**
-     * $ORM\Column(name="name", type="string")
-     */
-    private $device;
-    
-    /**
-     * @ORM\Column(type="string")
+     * @var string|null
+     *
+     * @ORM\Column(name="pwd", type="string", length=255, nullable=true)
      */
     private $pwd;
-    
+
     /**
-     * @ORM\Column(type="integer") 
+     * @var bool|null
+     *
+     * @ORM\Column(name="gender", type="boolean", nullable=true)
      */
     private $gender;
-    
+
     /**
-     * @ORM\Column(type="string")
+     * @var int|null
+     *
+     * @ORM\Column(name="group_id", type="integer", nullable=true)
+     */
+    private $groupId;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="device_mark", type="string", length=50, nullable=true)
+     */
+    private $deviceMark = '';
+
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="created", type="datetime", nullable=true)
      */
     private $created;
-    
-    public function setPwd($pwd){
-        $this->pwd = $pwd;
+
+    /**
+     * @var bool|null
+     *
+     * @ORM\Column(name="enabled", type="boolean", nullable=true, options={"default"="1"})
+     */
+    private $enabled = '1';
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+    /**
+     * @return the $name
+     */
+    public function getName()
+    {
+        return $this->name;
     }
-    
-    public function getId(){
-        return $this->id;
-    }
-    public function setGender($gender){
-        $this->gender = $gender;
-    }
-    
-    public function getPwd(){
+
+    /**
+     * @return the $pwd
+     */
+    public function getPwd()
+    {
         return $this->pwd;
     }
-    
-    public function getGender(){
+
+    /**
+     * @return the $gender
+     */
+    public function getGender()
+    {
         return $this->gender;
     }
-    /**
-     * @return string $created
-     */
-    public function getCreated()
-    {
-        return $this->created;
-    }
 
     /**
-     * @param string $created
-     */
-    public function setCreated($created)
-    {
-        $this->created = $created;
-    }
-//     /**
-//      * @return \AppBundle\Entity\Group $group
-//      */
-//     public function getGroup()
-//     {
-//         return $this->group;
-//     }
-
-//     /**
-//      * @param \AppBundle\Entity\Group $group
-//      */
-//     public function setGroup(\AppBundle\Entity\Group $group=null)
-//     {
-//         $this->group = $group;
-//     }
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-    /**
-     * @return int $groupId
+     * @return the $groupId
      */
     public function getGroupId()
     {
@@ -118,38 +103,101 @@ class User{
     }
 
     /**
-     * @param int $groupId
+     * @return the $deviceMark
      */
-    public function setGroupId($groupId)
+    public function getDeviceMark()
     {
-        $this->groupId = $groupId;
-    }
-    /**
-     * @return string $device
-     */
-    public function getDevice()
-    {
-        return $this->device;
+        return $this->deviceMark;
     }
 
     /**
-     * @param string $device
+     * @return the $created
      */
-    public function setDevice($device)
+    public function getCreated()
     {
-        $this->device = $device;
-    }
-    
-    public function getName()
-    {
-        return $this->name;
+        return $this->created;
     }
 
+    /**
+     * @return the $enabled
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param Ambigous <string, NULL> $name
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
-    
-    
+    /**
+     * @param Ambigous <string, NULL> $pwd
+     */
+    public function setPwd($pwd)
+    {
+        $this->pwd = $pwd;
+    }
+
+    /**
+     * @param Ambigous <boolean, NULL> $gender
+     */
+    public function setGender($gender)
+    {
+        $this->gender = $gender;
+    }
+
+    /**
+     * @param Ambigous <number, NULL> $groupId
+     */
+    public function setGroupId($groupId)
+    {
+        $this->groupId = $groupId;
+    }
+
+    /**
+     * @param Ambigous <string, NULL> $deviceMark
+     */
+    public function setDeviceMark($deviceMark)
+    {
+        $this->deviceMark = $deviceMark;
+    }
+
+    /**
+     * @param Ambigous <DateTime, NULL> $created
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
+    /**
+     * @param Ambigous <boolean, NULL> $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+    }
+    /**
+     * @return the $id
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param number $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+
+
+
 }
