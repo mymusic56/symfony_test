@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\Serverice;
+namespace AppBundle\Service;
 
 class UserService{
     public static function aaa(){

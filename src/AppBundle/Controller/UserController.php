@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use AppBundle\Entity\Feedback;
 use AppBundle\Entity\User;
-use AppBundle\Serverice\UserService;
+use AppBundle\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -182,7 +182,8 @@ class UserController extends Controller{
          * 如何支持： http://symfony.mytest.com/check?id=2&gender=2
          * 
          */
-        return new Response("获取用户 :$id 的信息， 并且性别为：$gender");
+        return new JsonResponse(['status' => 1, 'id'=>$id, 'gender' => $gender]);
+//         return new Response("获取用户 :$id 的信息， 并且性别为：$gender");
     }
     
     /**
@@ -231,6 +232,7 @@ class UserController extends Controller{
         /*
          * Service 使用方式一：
          */
+        /* @var $userService \AppBundle\Service\UserService */
         $userService = $this->get('userservice');
         $a = $userService::aaa();
         $b = $userService->b();
@@ -249,7 +251,9 @@ class UserController extends Controller{
          * 没有语法提示
          * 
          */
+        UserService::aaa();
         $userService = $this->get(UserService::class);
+        /* @var $userService \AppBundle\Service\UserService */
         $res = $userService::aaa();
         $b = $userService->b();
         return new Response("getRandom2: $res, $b");

@@ -7,7 +7,7 @@ parameters:
 
 services:
     userservice:
-        class: AppBundle\Serverice\UserService
+        class: AppBundle\Service\UserService
     memcached:
         class: Memcached
         calls:
