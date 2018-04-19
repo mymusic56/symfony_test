@@ -6,8 +6,18 @@ parameters:
         - { host: 127.0.0.1, port: 11211 }
 
 services:
+    # default configuration for services in *this* file
+    signatureCheckService:
+        class: AppBundle\EventSubscriber\SignatureSubscriber
+        autowire: true
+        autoconfigure: true
+        public: false
+        arguments:
+            $privatekey: "%privatekey%"
     userservice:
         class: AppBundle\Service\UserService
+    curlservice:
+        class: AppBundle\Service\CurlService
     memcached:
         class: Memcached
         calls:

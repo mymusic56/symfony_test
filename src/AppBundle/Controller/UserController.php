@@ -2,9 +2,10 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use AppBundle\Entity\Feedback;
 use AppBundle\Entity\User;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use AppBundle\Service\Signatrue;
 
 /**
  * @IgnoreAnnotation({"datetime", "author"})
@@ -162,6 +164,50 @@ class UserController extends Controller{
         return new JsonResponse($data2);
 //         return new Response('user info');
     }
+    /**
+     * ParamConverter
+     * 
+     * @ApiDoc(
+     *      description="默认以参数为主键"
+     * )
+     * @Route("/user/edit/{id}")
+     */
+    public function userEdit(User $user)
+    {
+        var_dump($user->getId(), $user->getName());die;
+    }
+    
+    /**
+     * ParamConverter
+     * 
+     * @ApiDoc(
+     *      description="请求地址： http://symfony.mytest.com/user/edit2/xiaohong"
+     * )
+     * @Route("/user/edit2/{name}")
+     * @ParamConverter("user", class="AppBundle:User", options={"name" = "name"})
+     */
+    public function userEdit2(User $user)
+    {
+        var_dump($user->getId(), $user->getName());die;
+    }
+    
+    /**
+     * 总数查询
+     * @Route("/user/count")
+     */
+    public function userCount()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $userRepository = $em->getRepository(User::class);
+        $result2 = $userRepository->createQueryBuilder('u')
+        ->where("u.groupId =:groupId")
+        ->select('count(u)')
+        ->setParameter("groupId", 1)
+        ->getQuery()
+        ->getSingleScalarResult();
+        var_dump($result2);die;
+    }
+    
     /**
      * @Route("/check/{id}/{gender}",defaults={"id"=2,"gender":1}, requirements={
      *      "id":"\d+"
@@ -413,5 +459,27 @@ class UserController extends Controller{
         }
         
         return new JsonResponse(['status'=>1, 'msg' => $msg]);
+    }
+    
+    /**
+     * 
+     * @Route("/user/signTest")
+     */
+    public function signTest(Request $request)
+    {
+        $str = '{"system":"android","appid":"10000","channel":"","version":"1.0.1","timestamp":"15100000000","mobile":"18580151305","type":"1"}';
+        $param = json_decode($str, true);
+        $signature = new Signatrue();
+        $key = 'kkkppp';
+        $para_sort = $signature->argSort($param);
+        $param['sign'] = $signature->buildRequestMysign($para_sort, $key);
+        
+        /* @var $curl \AppBundle\Service\CurlService */
+        $curl = $this->get('curlservice');
+        $url = 'http://symfony.mytest.com/foo/bar';
+//         $url = 'http://huilv.qm.com/foo/bar';
+        $curl->send($url, $param, 'POST');
+        $result = $curl->getResult();
+        var_dump($param, $signature->getParamString(), $result);die;
     }
 }
