@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\Controller;
+namespace AppBundle\Controller\User;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use AppBundle\Entity\Feedback;
-use AppBundle\Entity\User;
+use AppBundle\Entity\Users;
 use AppBundle\Service\UserService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\NativeRequestHandler;
@@ -29,7 +29,7 @@ class UserController extends Controller{
     public function userList(){
         
         /* @var $userRepository \AppBundle\Repository\UserRepository */
-        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $userRepository = $this->getDoctrine()->getRepository(Users::class);
         
         
         /*
@@ -77,16 +77,16 @@ class UserController extends Controller{
         $list = $query->getResult(); 
         
         //em: entity manager
+        /* @var $em \Doctrine\ORM\EntityManager */
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
                 'SELECT u
-                    FROM AppBundle:User u
+                    FROM AppBundle:Users u
                     WHERE u.id > :id
                     ORDER BY u.id ASC'
                 )->setParameter('id', 3);
                 
         $list = $query->getResult();
-        var_dump( $list);
         return $this->render('user/userList.html.twig',array(
                 'userList' => $list,
                 'title' => '用户列表'
@@ -104,7 +104,7 @@ class UserController extends Controller{
         $em = $this->getDoctrine()->getManager();
         $query = $em->createQuery(
             'SELECT u.deviceMark,u.name
-                    FROM AppBundle:User u
+                    FROM AppBundle:Users u
                     WHERE u.id > :id
                     ORDER BY u.id ASC'
             )->setParameter('id', 1);
@@ -112,7 +112,7 @@ class UserController extends Controller{
         $list = $query->getResult();
         var_dump($list);
         
-        $data = $this->getDoctrine()->getRepository(User::class)->findOneBy([
+        $data = $this->getDoctrine()->getRepository(Users::class)->findOneBy([
             'deviceMark' => 'Leeee'
         ]);
         
@@ -136,7 +136,7 @@ class UserController extends Controller{
         $result = $userRepository->getUserListByGroupId(1);
         
         $res = [];
-        /* @var $result \AppBundle\Entity\User */
+        /* @var $result \AppBundle\Entity\Users */
         foreach ($result as $item) {
             $res[] = [
                 'id' => $item->getId(),
@@ -155,9 +155,9 @@ class UserController extends Controller{
      * @Route("/user/userInfo")
      */
     public function useInfo(){
-        $data = $this->getDoctrine()->getRepository(User::class)->find(3);
+        $data = $this->getDoctrine()->getRepository(Users::class)->find(3);
         
-        $data2 = $this->getDoctrine()->getManager()->find('AppBundle:User', 3);
+        $data2 = $this->getDoctrine()->getManager()->find('AppBundle:Users', 3);
         
         
         var_dump($data, $data2);die;
@@ -172,7 +172,7 @@ class UserController extends Controller{
      * )
      * @Route("/user/edit/{id}")
      */
-    public function userEdit(User $user)
+    public function userEdit(Users $user)
     {
         var_dump($user->getId(), $user->getName());die;
     }
@@ -186,7 +186,7 @@ class UserController extends Controller{
      * @Route("/user/edit2/{name}")
      * @ParamConverter("user", class="AppBundle:User", options={"name" = "name"})
      */
-    public function userEdit2(User $user)
+    public function userEdit2(Users $user)
     {
         var_dump($user->getId(), $user->getName());die;
     }
@@ -198,7 +198,7 @@ class UserController extends Controller{
     public function userCount()
     {
         $em = $this->getDoctrine()->getManager();
-        $userRepository = $em->getRepository(User::class);
+        $userRepository = $em->getRepository(Users::class);
         $result2 = $userRepository->createQueryBuilder('u')
         ->where("u.groupId =:groupId")
         ->select('count(u)')
@@ -256,7 +256,7 @@ class UserController extends Controller{
         //entity manager
         $em = $this->getDoctrine()->getManager();
         
-        $user = new User();
+        $user = new Users();
         $user->setName('wangwu');
         $user->setPwd('abcdefg');
         $user->setGender(2);
@@ -481,5 +481,51 @@ class UserController extends Controller{
         $curl->send($url, $param, 'POST');
         $result = $curl->getResult();
         var_dump($param, $signature->getParamString(), $result);die;
+    }
+    
+    /**
+     * @Route("/user/file_cache")
+     */
+    public function cacheTest()
+    {
+        
+        var_dump(time(), strtotime('+5 min'));
+        
+        $cache = new \Symfony\Component\Cache\Simple\FilesystemCache();
+        $directory = __DIR__.'/../../../var/cache/doccache';
+        $docFileCache = new \Doctrine\Common\Cache\FilesystemCache($directory);
+        $id = 'doc.file.cache.test';
+        $res = $docFileCache->fetch($id);
+        if ($res === false) {
+            $data = ['test' => 1234];
+            $docFileCache->save($id, $data);
+            var_dump('id 不存在');
+        }
+        $docFileCache->deleteAll();
+        var_dump($res);
+        // save a new item in the cache
+        
+        // or set it with a custom ttl
+        // $cache->set('stats.products_count', 4711, 3600);
+        
+        // retrieve the cache item
+        if (!$cache->has('stats.products_count')) {
+            // ... item does not exists in the cache
+            $cache->set('stats.products_count', time());
+            var_dump('item does not exists in the cache');
+        }
+        
+        // retrieve the value stored by the item
+        $productsCount = $cache->get('stats.products_count');
+        var_dump($productsCount);
+        // or specify a default value, if the key doesn't exist
+        // $productsCount = $cache->get('stats.products_count', 100);
+        
+        // remove the cache key
+        $cache->delete('stats.products_count');
+        
+        // clear *all* cache keys
+        $cache->clear();
+        exit("eee");
     }
 }
