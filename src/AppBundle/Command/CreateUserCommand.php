@@ -1,7 +1,7 @@
 <?php
 namespace AppBundle\Command;
 
-use AppBundle\Entity\User;
+use AppBundle\Entity\Users;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,7 +52,7 @@ class CreateUserCommand extends ContainerAwareCommand
         $pwd = $input->getArgument('pwd');
         
         $em = $this->getContainer()->get('doctrine')->getManager();
-        $userRepository = $em->getRepository(User::class);
+        $userRepository = $em->getRepository(Users::class);
         
         /* @var $userRepository \AppBundle\Repository\UserRepository */
         $users = $userRepository->findBy([
@@ -60,7 +60,7 @@ class CreateUserCommand extends ContainerAwareCommand
         ]);
         
         $result = [];
-        /* @var $user \AppBundle\Entity\User */
+        /* @var $user \AppBundle\Entity\Users */
         foreach ($users as $user) {
             $result[] = [
                 'id' => $user->getId(),
@@ -69,7 +69,7 @@ class CreateUserCommand extends ContainerAwareCommand
         }
         
         //persist data
-        $new_user = new User();
+        $new_user = new Users();
         $new_user->setName($name);
         $new_user->setPwd($pwd);
         
